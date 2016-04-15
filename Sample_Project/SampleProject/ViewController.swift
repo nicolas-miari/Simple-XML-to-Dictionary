@@ -14,7 +14,11 @@ class ViewController: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        /*
+         Sample XML file taken  from:
+         http://www.w3schools.com/xml/cd_catalog.xml
+         */
         
         guard let path = NSBundle.mainBundle().pathForResource("Catalog", ofType: "xml") else {
             return print("File Not Found!")
@@ -30,13 +34,13 @@ class ViewController: UIViewController
                 print("Result: \(result)")
             },
             parseErrorHandler: {error in
+                
                 print("Error: \(error.localizedDescription)")
             }
         )
         
         parser.start()
     }
-
 
 }
 
