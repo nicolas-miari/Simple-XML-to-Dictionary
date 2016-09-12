@@ -18,11 +18,11 @@ class ViewController: UIViewController {
          http://www.w3schools.com/xml/cd_catalog.xml
          */
         
-        guard let path = NSBundle.mainBundle().pathForResource("Catalog", ofType: "xml") else {
+        guard let path = Bundle.main.path(forResource: "Catalog", ofType: "xml") else {
             return print("File Not Found!")
         }
         
-        guard let data = NSData(contentsOfFile: path) else {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
             return print("Failed to read file!")
         }
         

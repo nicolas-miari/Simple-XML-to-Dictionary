@@ -51,33 +51,33 @@ import UIKit
 class SimpleXMLParser: NSObject {
     
     /// Root node.
-    private var root:SimpleXMLNode!
+    fileprivate var root:SimpleXMLNode!
     
     
     /// Node being currently built.
-    private var currentNode:SimpleXMLNode!
+    fileprivate var currentNode:SimpleXMLNode!
     
     
     /// Text being parsed. Goes into the current node.
-    private var characters:String!
+    fileprivate var characters:String!
     
     
     /// Cocoa parser object.
-    private let parser: NSXMLParser!
+    fileprivate let parser: XMLParser!
     
     
     ///
-    typealias XMLParseCompletionHandler = (result:[String : AnyObject]) -> (Void)
+    typealias XMLParseCompletionHandler = (_ result:[String : AnyObject]) -> (Void)
     
     
     ///
-    private let completionHandler:XMLParseCompletionHandler
+    fileprivate let completionHandler:XMLParseCompletionHandler
     
     ///
-    typealias XMLParseErrorHandler = (error:NSError) -> (Void)
+    typealias XMLParseErrorHandler = (_ error:NSError) -> (Void)
     
     ///
-    private let errorHandler:XMLParseErrorHandler
+    fileprivate let errorHandler:XMLParseErrorHandler
     
     ///
     var removeNamespaces:Bool = false
@@ -91,14 +91,14 @@ class SimpleXMLParser: NSObject {
      - parameter parseCompletionHandler: Closure to execute if and when the parsing finishes successfully.
      - parameter parseErrorHandler: Closure to execute if and when the parser encounters an error and aborts.
      */
-    init(withSourceData dataToParse:NSData,
-        parseCompletionHandler:XMLParseCompletionHandler,
-        parseErrorHandler:XMLParseErrorHandler
+    init(withSourceData dataToParse:Data,
+        parseCompletionHandler:@escaping XMLParseCompletionHandler,
+        parseErrorHandler:@escaping XMLParseErrorHandler
         ) {
         
         completionHandler = parseCompletionHandler
         errorHandler      = parseErrorHandler
-        parser            = NSXMLParser(data: dataToParse)
+        parser            = XMLParser(data: dataToParse)
         
         super.init()
         
@@ -126,35 +126,35 @@ class SimpleXMLParser: NSObject {
 // MARK: - NSXMLParserDelegate
 
 
-extension SimpleXMLParser: NSXMLParserDelegate {
+extension SimpleXMLParser: XMLParserDelegate {
     
-    func parserDidStartDocument(parser: NSXMLParser) {
+    func parserDidStartDocument(_ parser: XMLParser) {
         root = SimpleXMLNode(name: "xml")
         currentNode = root
     }
     
     
-    func parserDidEndDocument(parser: NSXMLParser) {
+    func parserDidEndDocument(_ parser: XMLParser) {
         
         // This GCD call avoids the error "NSXMLParser does not support
         // reentrant parsing" if (for example) the caller initiates a second 
         // parse task from within the completion handler:
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             // Convert the assembled node hierarchy into nested dictionaries/
             // arrays/strings (i.e., JSON), and pass back to caller:
-            self.completionHandler(result: self.root.dictionaryRepresentation() as! [String : AnyObject])
+            self.completionHandler(self.root.dictionaryRepresentation() as! [String : AnyObject])
         }
     }
     
     
-    func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
+    func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
         // Pass error as-is to registered handler:
-        errorHandler(error: parseError)
+        errorHandler(parseError as NSError)
     }
     
     
-    func parser(parser: NSXMLParser,
+    func parser(_ parser: XMLParser,
         didStartElement elementName: String,
         namespaceURI: String?,
         qualifiedName qName: String?,
@@ -176,17 +176,17 @@ extension SimpleXMLParser: NSXMLParserDelegate {
     }
     
     
-    func parser(parser: NSXMLParser, foundCharacters string: String) {
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
         if characters == nil {
             characters = ""
         }
         
-        characters.appendContentsOf(string)
+        characters.append(string)
     }
     
     
     func parser(
-        parser: NSXMLParser,
+        _ parser: XMLParser,
         didEndElement elementName: String,
         namespaceURI: String?,
         qualifiedName qName: String?) {

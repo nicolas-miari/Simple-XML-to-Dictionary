@@ -7,6 +7,26 @@
 //
 
 import UIKit
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 /**
  Auxiliary class used to build a node hierarchy in memory, then convert it
@@ -23,7 +43,7 @@ class SimpleXMLNode: NSObject {
 
     
     /// Child (contained) nodes.
-    private (set) var children:[SimpleXMLNode]?
+    fileprivate (set) var children:[SimpleXMLNode]?
     
     
     /// Text content (for leaf nodes).
@@ -45,7 +65,7 @@ class SimpleXMLNode: NSObject {
      performed (e.g., whether the child is equal to the receiver or an 
      ancestor).
      */
-    func addChild(node:SimpleXMLNode) {
+    func addChild(_ node:SimpleXMLNode) {
         if children == nil {
             children = [SimpleXMLNode]()
         }
@@ -63,7 +83,7 @@ class SimpleXMLNode: NSObject {
         
         guard children?.count > 0 else {
             // Node is a leaf (i.e., terminal) element. Return string value:
-            return content ?? ""
+            return content as AnyObject? ?? "" as AnyObject
         }
         
         // Node has children. Return array or dictionaries...
@@ -99,11 +119,11 @@ class SimpleXMLNode: NSObject {
             else{
                 // Array contains one or more elements of the same name; add it
                 // as-is:
-                dictionary[name] = array
+                dictionary[name] = array as AnyObject?
             }
         }
         
-        return dictionary
+        return dictionary as AnyObject
     }
     
 }
