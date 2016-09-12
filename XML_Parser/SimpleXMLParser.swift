@@ -50,19 +50,19 @@ import UIKit
  */
 class SimpleXMLParser: NSObject {
     
-    ///
+    /// Root node.
     private var root:SimpleXMLNode!
     
     
-    ///
+    /// Node being currently built.
     private var currentNode:SimpleXMLNode!
     
     
-    ///
+    /// Text being parsed. Goes into the current node.
     private var characters:String!
     
     
-    ///
+    /// Cocoa parser object.
     private let parser: NSXMLParser!
     
     
@@ -84,13 +84,16 @@ class SimpleXMLParser: NSObject {
     
     
     /**
-     - parameter dataToParse:
-     - parameter parseCompletionHandler:
-     - parameter parseErrorHandler:
+     Initializes the parser object. Actual parsing does not occur
+     until `start()` is not called.
+     
+     - parameter dataToParse: NSData object representing the input XML (encoded as UTF8).
+     - parameter parseCompletionHandler: Closure to execute if and when the parsing finishes successfully.
+     - parameter parseErrorHandler: Closure to execute if and when the parser encounters an error and aborts.
      */
     init(withSourceData dataToParse:NSData,
-                        parseCompletionHandler:XMLParseCompletionHandler,
-                        parseErrorHandler:XMLParseErrorHandler
+        parseCompletionHandler:XMLParseCompletionHandler,
+        parseErrorHandler:XMLParseErrorHandler
         ) {
         
         completionHandler = parseCompletionHandler
@@ -104,6 +107,7 @@ class SimpleXMLParser: NSObject {
     
     
     /**
+     Begins the parsing.
      */
     func start() {
         
