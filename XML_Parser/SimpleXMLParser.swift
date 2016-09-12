@@ -48,8 +48,7 @@ import UIKit
      ]
  
  */
-class SimpleXMLParser: NSObject
-{
+class SimpleXMLParser: NSObject {
     
     ///
     private var root:SimpleXMLNode!
@@ -92,8 +91,8 @@ class SimpleXMLParser: NSObject
     init(withSourceData dataToParse:NSData,
                         parseCompletionHandler:XMLParseCompletionHandler,
                         parseErrorHandler:XMLParseErrorHandler
-        )
-    {
+        ) {
+        
         completionHandler = parseCompletionHandler
         errorHandler      = parseErrorHandler
         parser            = NSXMLParser(data: dataToParse)
@@ -106,10 +105,9 @@ class SimpleXMLParser: NSObject
     
     /**
      */
-    func start()
-    {
+    func start() {
+        
         if removeNamespaces {
-            
             parser.shouldProcessNamespaces = true
             parser.shouldReportNamespacePrefixes = false
         }
@@ -120,41 +118,45 @@ class SimpleXMLParser: NSObject
 }
 
 
-extension SimpleXMLParser: NSXMLParserDelegate
-{
-    func parserDidStartDocument(parser: NSXMLParser)
-    {
+// .............................................................................
+// MARK: - NSXMLParserDelegate
+
+
+extension SimpleXMLParser: NSXMLParserDelegate {
+    
+    func parserDidStartDocument(parser: NSXMLParser) {
         root = SimpleXMLNode(name: "xml")
-        
         currentNode = root
     }
     
     
-    func parserDidEndDocument(parser: NSXMLParser)
-    {
-        // This GCD call avoids the error "NSXMLParser does not support 
+    func parserDidEndDocument(parser: NSXMLParser) {
+        
+        // This GCD call avoids the error "NSXMLParser does not support
         // reentrant parsing" if (for example) the caller initiates a second 
         // parse task from within the completion handler:
         dispatch_async(dispatch_get_main_queue()) {
             
             // Convert the assembled node hierarchy into nested dictionaries/
             // arrays/strings (i.e., JSON), and pass back to caller:
-            
             self.completionHandler(result: self.root.dictionaryRepresentation() as! [String : AnyObject])
         }
     }
     
     
-    func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError)
-    {
+    func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
         // Pass error as-is to registered handler:
         errorHandler(error: parseError)
     }
     
     
-    func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String])
-    {
-        // Reset string, otherwise it adds e.g. newlines between elements, 
+    func parser(parser: NSXMLParser,
+        didStartElement elementName: String,
+        namespaceURI: String?,
+        qualifiedName qName: String?,
+        attributes attributeDict: [String : String]) {
+        
+        // Reset string, otherwise it adds e.g. newlines between elements,
         // indent space, etc:
         characters = nil
         
@@ -170,8 +172,7 @@ extension SimpleXMLParser: NSXMLParserDelegate
     }
     
     
-    func parser(parser: NSXMLParser, foundCharacters string: String)
-    {
+    func parser(parser: NSXMLParser, foundCharacters string: String) {
         if characters == nil {
             characters = ""
         }
@@ -180,8 +181,12 @@ extension SimpleXMLParser: NSXMLParserDelegate
     }
     
     
-    func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?)
-    {
+    func parser(
+        parser: NSXMLParser,
+        didEndElement elementName: String,
+        namespaceURI: String?,
+        qualifiedName qName: String?) {
+        
         // If present, set text content of node: (LEAF)
         if characters != nil {
             currentNode.content = characters

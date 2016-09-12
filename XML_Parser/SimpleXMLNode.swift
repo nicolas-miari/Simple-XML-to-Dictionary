@@ -12,8 +12,8 @@ import UIKit
  Auxiliary class used to build a node hierarchy in memory, then convert it
  to ditionaries (recursively).
  */
-class SimpleXMLNode: NSObject
-{
+class SimpleXMLNode: NSObject {
+    
     /// Element (XML tag) name.
     var name:String
 
@@ -33,8 +33,7 @@ class SimpleXMLNode: NSObject
     /**
      Designated initializer. Only the name is required.
      */
-    init(name:String)
-    {
+    init(name:String) {
         self.name = name
         
         super.init()
@@ -46,8 +45,7 @@ class SimpleXMLNode: NSObject
      performed (e.g., whether the child is equal to the receiver or an 
      ancestor).
      */
-    func addChild(node:SimpleXMLNode)
-    {
+    func addChild(node:SimpleXMLNode) {
         if children == nil {
             children = [SimpleXMLNode]()
         }
@@ -61,13 +59,12 @@ class SimpleXMLNode: NSObject
     /** 
      (Recursive)
      */
-    func dictionaryRepresentation() -> AnyObject
-    {
+    func dictionaryRepresentation() -> AnyObject {
+        
         guard children?.count > 0 else {
             // Node is a leaf (i.e., terminal) element. Return string value:
             return content ?? ""
         }
-        
         
         // Node has children. Return array or dictionaries...
         
